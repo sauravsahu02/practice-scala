@@ -1,4 +1,7 @@
-package google
+package google.problems
+
+import org.scalatest.{BeforeAndAfter, FunSuite}
+
 class ContiguousSubarraySumWithinRangeTest extends FunSuite with BeforeAndAfter{
 
   test("Input 1") {

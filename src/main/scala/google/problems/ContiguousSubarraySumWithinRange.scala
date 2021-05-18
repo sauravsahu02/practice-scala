@@ -1,4 +1,4 @@
-package google
+package google.problems
 
 class ContiguousSubarraySumWithinRange(val inputArr: Array[Int]) extends SingleIntArrayOperation(inputArr){
 /*

@@ -1,4 +1,4 @@
-package google
+package google.problems
 
 class SingleIntArrayOperation(array: Array[Int]){
   def printInput(): Unit = {
