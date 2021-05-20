@@ -2,7 +2,7 @@ package google.problems
 
 import scala.collection.mutable.TreeSet
 
-class ContiguousSubarraySumWithinRange(val inputArr: Array[Int]) extends SingleIntArrayOperation(inputArr){
+class ContiguousSubarraySumWithinRange(val inputArr: Array[Int]){
 /*
  https://www.careercup.com/question?id=5200686994161664
  Given an array int32 arr[] of size n, return the number of non-empty contiguous sub-arrays whose sum lies in range [a, b]
