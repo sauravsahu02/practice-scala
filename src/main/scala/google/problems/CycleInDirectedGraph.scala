@@ -3,7 +3,7 @@ package google.problems
 import scala.collection._
 
 class CycleInDirectedGraph(val inputArr: Array[(Int, Int)]) {
-  // Algorithm : Start from each candidate vertex, do a dfs on all 'unmarked' neighbouring vertices, and unmark the current vertex
+  // Algorithm : Start from each candidate vertex, do a dfs on all 'unmarked' neighbouring vertices, and then unmark the vertex
   // Common Mistake: Ensure that the return value 'true' is transmitted down the stack
   // Optimization: Vertex, with no arrow coming out of it, can never be part of any cycle, so no DFS required for them.
   type M = Map[Int, List[Int]]
