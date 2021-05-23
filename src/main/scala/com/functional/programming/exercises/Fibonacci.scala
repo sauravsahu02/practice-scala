@@ -1,5 +1,7 @@
-package functional.programming.exercises
-
+package com.functional.programming.exercises
+/**
+ * Created by Saurav Sahu - 20-May-2021
+ */
 object Fibonacci {
   /** EXERCISE 1 (optional): Write a function to get the nth Fibonacci number. The
       first two Fibonacci numbers are 0 and 1, and the next number is always the sum of
@@ -12,8 +14,5 @@ object Fibonacci {
       else fib(s2, s1+s2, n-1)
     }
     fib(0, 1, n)
-  }
-  def main(args: Array[String]): Unit = {
-
   }
 }

@@ -1,7 +1,9 @@
-package google.problems
+package com.google.problems
 
 import scala.collection.mutable
-
+/**
+ * Created by Saurav Sahu - 21-May-2021
+ */
 class FindLargestSubset(val inputArr: Array[Int]) {
   // Given an int array which might contain duplicates, find the largest subset of
   // it which form a sequence.
@@ -9,13 +11,13 @@ class FindLargestSubset(val inputArr: Array[Int]) {
   // then ans is 4,5,6,7
   // Sorting is an obvious solution. Can this be done in O(n) time
 
-  def getLength(): Int = {
+  def getLength: Int = {
 
     val mapToOtherEnd = mutable.HashMap[Int, Int]()
 
     def getLengthAfterJoiningSeq(leftSeqEnd : Int, rightSeqStart : Int): Int ={
-      val newStart = mapToOtherEnd.get(leftSeqEnd).get
-      val newEnd = mapToOtherEnd.get(rightSeqStart).get
+      val newStart = mapToOtherEnd(leftSeqEnd)
+      val newEnd = mapToOtherEnd(rightSeqStart)
       mapToOtherEnd.update(newEnd, newStart)
       mapToOtherEnd.update(newStart, newEnd)
       newEnd - newStart + 1

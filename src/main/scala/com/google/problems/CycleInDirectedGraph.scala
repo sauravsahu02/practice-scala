@@ -1,16 +1,18 @@
-package google.problems
+package com.google.problems
 
 import scala.collection._
-
+/**
+ * Created by Saurav Sahu - 20-May-2021
+ */
 class CycleInDirectedGraph(val inputArr: Array[(Int, Int)]) {
   // Algorithm : Start from each candidate vertex, do a dfs on all 'unmarked' neighbouring vertices, and then unmark the vertex
   // Common Mistake: Ensure that the return value 'true' is transmitted down the stack
   // Optimization: Vertex, with no arrow coming out of it, can never be part of any cycle, so no DFS required for them.
   type M = Map[Int, List[Int]]
-  def hasCycle() : Boolean = {
+  def hasCycle: Boolean = {
     def groupConnectedVertices() : M = {
       val groupedConnectionMap = mutable.Map[Int, List[Int]]().withDefaultValue(List.empty)
-      inputArr.map { case (from, to) =>
+      inputArr.foreach { case (from, to) =>
         groupedConnectionMap(from) = to :: groupedConnectionMap(from)
       }
       groupedConnectionMap
@@ -19,14 +21,13 @@ class CycleInDirectedGraph(val inputArr: Array[(Int, Int)]) {
     var traversed = connectionsMap.keys.map(vertex => vertex -> false).to(mutable.Map)  // Scala 2.13 feature
     /**
      * A cycle is found that's when any visited vertex gets visited once again.
-     * @param vertex
      * @return true if cycle is found, returns false otherwise.
      */
     def dfs(vertex : Int) : Boolean = {
       if (!connectionsMap.contains(vertex)){
         return false  // dead-end
       }
-      if (traversed(vertex) == true) {
+      if (traversed(vertex)) {
         return true   // already visited in ongoing route
       }
       traversed.update(vertex, true)

@@ -1,5 +1,7 @@
-package google.problems
-
+package com.google.problems
+/**
+ * Created by Saurav Sahu - 23-May-2021
+ */
 class RepeatingSubsequence {
   /*
   Given a string (1-d array) , find if there is any sub-sequence that repeats itself.

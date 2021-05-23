@@ -1,7 +1,9 @@
-package google.problems
+package com.google.problems
 
 import org.scalatest.FunSuite
-
+/**
+ * Created by Saurav Sahu - 23-May-2021
+ */
 class IntersectionOfSortedArraysTest extends FunSuite {
   test("Test1 - nonempty arrays"){
     val (x, y) = (5, 10)
@@ -14,7 +16,6 @@ class IntersectionOfSortedArraysTest extends FunSuite {
     val (x, y) = (5, 10)
     val input1 = (1 to y).toArray ++ Array(y)
     val input2 = Array(x) ++ (x to 15).toArray
-    println(input2.mkString(","))
     assert(new IntersectionOfSortedArrays().getIntersectionResult(input1, input2).sameElements((x to y).toArray[Int]))
     assert(new IntersectionOfSortedArrays().getIntersectionResult(input2, input1).sameElements((x to y).toArray[Int]))
   }

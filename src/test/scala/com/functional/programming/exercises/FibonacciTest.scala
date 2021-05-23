@@ -1,4 +1,4 @@
-package functional.programming.exercises
+package com.functional.programming.exercises
 
 import org.scalatest.FunSuite
 

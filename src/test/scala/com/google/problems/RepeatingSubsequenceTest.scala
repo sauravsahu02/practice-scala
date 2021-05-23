@@ -1,7 +1,9 @@
-package google.problems
+package com.google.problems
 
 import org.scalatest.FunSuite
-
+/**
+ * Created by Saurav Sahu - 23-May-2021
+ */
 class RepeatingSubsequenceTest extends FunSuite {
   // Below flag for the obscurity of the problem
   // see here, https://www.careercup.com/question?id=5931067269709824

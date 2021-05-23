@@ -1,7 +1,9 @@
-package google.problems
+package com.google.problems
 
 import scala.collection.mutable.ListBuffer
-
+/**
+ * Created by Saurav Sahu - 22-May-2021
+ */
 class IntersectionOfSortedArrays {
   def getIntersectionResult(arr1 : Array[Int], arr2 : Array[Int]) : Array[Int] = {
     var i = 0
