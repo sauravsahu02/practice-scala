@@ -12,9 +12,8 @@ object EmailAddressValidation {
     val localAndDomainPart = Array(new StringBuilder, new StringBuilder)
     var counter = 0
     var isDomain = 0
-    emailAddress.toCharArray.zipWithIndex.foreach{
-      case (c, idx) =>
-        c match {
+    emailAddress.toCharArray.foreach{
+        c: Char => c match {
           case '(' => counter += 1
           case ')' => counter -= 1
           case '@' =>
@@ -22,6 +21,7 @@ object EmailAddressValidation {
             isDomain = 1 - isDomain
           case _  => if (counter == 0) localAndDomainPart(isDomain).append(c)
         }
+        if (counter < 0) return None
     }
     Option.when(counter == 0)(localAndDomainPart(0).toString(), localAndDomainPart(1).toString())
   }

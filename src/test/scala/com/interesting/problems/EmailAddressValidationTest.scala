@@ -61,4 +61,14 @@ class EmailAddressValidationTest extends FunSuite {
       "john.smith@example.com(comment))")
     assert(result.isEmpty)
   }
+  test("negative testing with screwed bracket") {
+    var result = EmailAddressValidation.getLocalPartAndDomain(
+      "())))(((abc@gmail.com")
+    assert(result.isEmpty)
+  }
+  test("negative testing with multiple @") {
+    var result = EmailAddressValidation.getLocalPartAndDomain(
+      "abc@gma@il.com")
+    assert(result.isEmpty)
+  }
 }
