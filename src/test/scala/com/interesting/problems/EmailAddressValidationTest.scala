@@ -37,8 +37,7 @@ class EmailAddressValidationTest extends FunSuite {
   }
   test("both local and domain part has comment with nesting") {
     val result = EmailAddressValidation.getLocalPartAndDomain(
-      "(anothercomment(comment))john.smith(anothercomment(comment))" +
-        "@" +
+      "(anothercomment(comment))john.smith(anothercomment(comment))" + "@" +
         "(anothercomment(comment))example.com(anothercomment(comment))")
     assert(result.isDefined)
     assert(result.get._1 == "john.smith")
@@ -49,11 +48,9 @@ class EmailAddressValidationTest extends FunSuite {
       "((comment))john.(excludeMe)smith((comment))" +
         "@" +
         "((comment))example.com((comment))")
-    assert(result.isDefined)
-    assert(result.get._1 == "john.smith")
-    assert(result.get._2 == "example.com")
+    assert(result.isEmpty)
   }
-  test("negative testing") {
+  test("negative testing with screwed bracket") {
     var result = EmailAddressValidation.getLocalPartAndDomain(
       "john.smith((comment)@example.com")
     assert(result.isEmpty)
@@ -61,9 +58,14 @@ class EmailAddressValidationTest extends FunSuite {
       "john.smith@example.com(comment))")
     assert(result.isEmpty)
   }
-  test("negative testing with screwed bracket") {
+  test("negative testing with screwed bracket in local part") {
     var result = EmailAddressValidation.getLocalPartAndDomain(
       "())))(((abc@gmail.com")
+    assert(result.isEmpty)
+  }
+  test("negative testing with screwed bracket in domain part") {
+    var result = EmailAddressValidation.getLocalPartAndDomain(
+      "abc@gmail.com())))(((")
     assert(result.isEmpty)
   }
   test("negative testing with multiple @") {

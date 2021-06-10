@@ -1,3 +1,5 @@
+package com.interesting.problems
+
 /**
  * Created by Saurav Sahu on 10th June 2021
  */
@@ -18,16 +20,20 @@ object EmailAddressValidation {
           if (counter == 1) openBracketPosition = index
         case ')' =>
           counter -= 1
-          if (index != emailAddress.indexOf('@') - 1 && openBracketPosition != 0) {
-            return None
+          if (counter == 0) {
+            // Comments in the middle of either part is not allowed. It must be on either end of two parts.
+            if ((isDomain == 0 && index != emailAddress.indexOf('@') - 1 && openBracketPosition != 0) ||
+                (isDomain == 1 && index != emailAddress.length - 1 && openBracketPosition != emailAddress.indexOf("@") + 1)) {
+              return None
+            }
           }
         case '@' =>
           if (counter != 0 || isDomain == 1) return None
           isDomain = 1 - isDomain
         case _  => if (counter == 0) localAndDomainPart(isDomain).append(c)
       }
-        index += 1
-        if (counter < 0) return None
+      index += 1
+      if (counter < 0) return None
     }
     Option.when(counter == 0)(localAndDomainPart(0).toString(), localAndDomainPart(1).toString())
   }
