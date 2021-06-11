@@ -2,6 +2,9 @@ package com.concurrency.examples
 
 import java.util.concurrent.ArrayBlockingQueue
 
+/**
+ * Created by Saurav Sahu on 11th June 2021
+ */
 
 object BlockingQueueDemo {
   final class ThreadPoolQueue(name: String) extends ArrayBlockingQueue[Runnable](1){

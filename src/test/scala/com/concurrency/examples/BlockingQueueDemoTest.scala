@@ -6,6 +6,10 @@ import com.concurrency.examples.BlockingQueueDemo._
 import org.scalatest.FunSuite
 import org.scalatest.Matchers.{noException, thrownBy}
 
+/**
+ * Created by Saurav Sahu on 11th June 2021
+ */
+
 class BlockingQueueDemoTest extends FunSuite {
   test("using SynchronousQueue - execute with sufficient pool size") {
     def executeWithEnoughPoolSize = {
