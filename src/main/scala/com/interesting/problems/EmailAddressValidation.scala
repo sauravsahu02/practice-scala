@@ -4,7 +4,7 @@ package com.interesting.problems
  * Created by Saurav Sahu on 10th June 2021
  */
 object EmailAddressValidation {
-  // As poer Wiki-page, comments are allowed with parentheses at either end of the local-part;
+  // As per Wiki-page, comments are allowed with parentheses at either end of the local-part;
   // e.g., john.smith(comment)@example.com and (comment)john.smith@example.com
   // are both equivalent to john.smith@example.com.
   def getLocalPartAndDomain(emailAddress: String): Option[(/*local part*/ String, /*domain part*/ String)] = {
@@ -21,7 +21,7 @@ object EmailAddressValidation {
         case ')' =>
           counter -= 1
           if (counter == 0) {
-            // Comments in the middle of either part is not allowed. It must be on either end of two parts.
+            // Comments in the middle of either part is not allowed. They must be on either end of the two parts.
             if ((isDomain == 0 && index != emailAddress.indexOf('@') - 1 && openBracketPosition != 0) ||
                 (isDomain == 1 && index != emailAddress.length - 1 && openBracketPosition != emailAddress.indexOf("@") + 1)) {
               return None
