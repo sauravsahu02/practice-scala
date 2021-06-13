@@ -40,11 +40,13 @@ class BlockingQueueDemoTest extends FunSuite with BeforeAndAfter with LazyLoggin
       executorService.execute(SlowProcess("Second"))
       executorService.execute(SlowProcess("Third"))
       executorService.shutdown()
+      executorService.awaitTermination(1, TimeUnit.HOURS)
     }
     assertThrows[RejectedExecutionException](executeWithInsufficientPoolSize)
-    assert(BlockingQueueDemo.runCount.get() == 0)
+    Thread.sleep(10000)
+    assert(BlockingQueueDemo.runCount.get() == 2)
   }
-  test("handle insufficient pool-size - backpressure handling - using ArrayBlockingQueue") {
+  test("using ArrayBlockingQueue - handle insufficient pool-size - backpressure handling") {
     def executeWithInsufficientPoolSize = {
       val executorService : ExecutorService = new ThreadPoolExecutor(2, 2, 1L,
         TimeUnit.HOURS, new ThreadPoolQueue("WaitsUntilThereIsSpace"))
