@@ -9,4 +9,5 @@ libraryDependencies ++= Seq(
 libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.3"
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
 
+libraryDependencies += "com.google.guava" % "guava" % "20.0"
 scalacOptions := Seq("-unchecked", "-deprecation")
