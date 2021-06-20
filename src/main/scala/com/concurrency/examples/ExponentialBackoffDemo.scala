@@ -23,7 +23,7 @@ object ExponentialBackoffDemo extends LazyLogging {
         throw exception
       case _ =>  // Both cases: Success(NaN) and Failure
         logger.info(f"retries left: $n")
-        logger.info(s"sleeping for $delayInMillis before next retry...")
+        logger.info(s"sleeping for $delayInMillis ms before next retry...")
         Thread.sleep(delayInMillis)
         retry(n-1, (delayInMillis * offset).asInstanceOf[Number].longValue(), offset)(fn)
     }
