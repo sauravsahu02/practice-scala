@@ -9,7 +9,7 @@ package com.functional.programming.exercises
  */
 class Polynomial(termsInput : Map[Int, Int]) {
   def this(pairs: (Int, Int)*) = this(pairs.toMap)
-  val terms = termsInput.withDefaultValue(0)
+  val terms = termsInput.withDefaultValue(0) // default value is critical for addition and subtraction
   def addTerm(terms: Map[Int, Int], term: (Int, Int)) : Map[Int, Int] = {
     val (exp, coeff) = term
     terms.updated(exp, coeff +  terms(exp))

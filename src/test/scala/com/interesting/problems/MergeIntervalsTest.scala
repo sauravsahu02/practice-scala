@@ -16,13 +16,11 @@ class MergeIntervalsTest extends FunSuite {
   test ("test - all merges into one"){
     var input = Array((1,4), (9,111), (2,10), (15,28))
     var expectedOutput = Array((1,111))
-    println(MergeIntervals(input).mkString(","))
     assert(MergeIntervals(input).sameElements(expectedOutput))
   }
   test ("test - merges some of them"){
     var input = Array((1,4), (9,10), (2,10), (15,28))
     var expectedOutput = Array((1,10), (15,28))
-    println(MergeIntervals(input).mkString(","))
     assert(MergeIntervals(input).sameElements(expectedOutput))
   }
   test ("test - merges none of them"){
