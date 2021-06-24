@@ -4,7 +4,6 @@
 
 package com.persistence.nosql.mongodb
 
-//import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase}
 import com.persistence.nosql.mongodb.HandlingCRUDOperations.mongoClient
 import com.typesafe.scalalogging.LazyLogging
 import org.mongodb.scala._
@@ -19,7 +18,7 @@ object HandlingCRUDOperations extends LazyLogging {
 
 class HandlingCRUDOperations {
   def createCollection(dbName : String, collectionName: String) = {
-    mongoClient.getDatabase(dbName).createCollection(collectionName)
+    Await.result(mongoClient.getDatabase(dbName).createCollection(collectionName).toFuture(), 2 seconds)
   }
   def getCollection(dbName : String, collectionName: String): MongoCollection[Document] = {
     mongoClient.getDatabase(dbName).getCollection(collectionName)
@@ -29,6 +28,10 @@ class HandlingCRUDOperations {
   }
   def dropDatabase(dbName: String) = {
     Await.ready(mongoClient.getDatabase(dbName).drop().toFuture(), 2 seconds)
+  }
+  def dropCollection(dbName : String, collectionName: String) = {
+    val collection = getCollection(dbName, collectionName)
+    Await.ready(collection.drop().toFuture(), 3 seconds)
   }
   def insertDocument(collection: MongoCollection[Document], document: Document) = {
     Await.result(collection.insertOne(document).toFuture(), 2 seconds)

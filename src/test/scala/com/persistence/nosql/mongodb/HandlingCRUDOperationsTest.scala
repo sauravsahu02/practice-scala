@@ -6,13 +6,13 @@ package com.persistence.nosql.mongodb
 
 import com.mongodb.MongoWriteException
 import com.typesafe.scalalogging.LazyLogging
-import org.mongodb.scala.Document
+import org.mongodb.scala._
 import org.mongodb.scala.bson.BsonInt32
 import org.scalatest.FunSuite
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
-import scala.language.postfixOps
 
 import scala.concurrent.Await
+import scala.language.postfixOps
 import scala.util.{Failure, Try}
 
 class HandlingCRUDOperationsTest extends FunSuite with LazyLogging{
@@ -23,15 +23,14 @@ class HandlingCRUDOperationsTest extends FunSuite with LazyLogging{
     val collectionsBefore = demoObj.getCollectionList("mydb")
     assert(collectionsBefore.isEmpty)
 
-    val createCollectionTest = demoObj.createCollection("mydb", "test")
-    Await.ready(createCollectionTest.toFuture(), 2 seconds)
+    demoObj.createCollection("mydb", "test")
     val collectionsAfter = demoObj.getCollectionList("mydb")
     assert(collectionsAfter.head.equals("test"))
   }
 
   test("insert one document - try inserting the same document again"){
     val collection = demoObj.getCollection("mydb", "test")
-    Await.result(collection.drop().toFuture(), 2 seconds)
+    Await.ready(collection.drop().toFuture(), 2 seconds)
 
     val doc: Document = Document("_id" -> 99999, "name" -> "MongoDB", "count" -> 1,
       "info" -> Document("x" -> 203, "y" -> 102))
@@ -45,14 +44,27 @@ class HandlingCRUDOperationsTest extends FunSuite with LazyLogging{
     }
   }
 
-  test("insert multiple document"){
+  test("insert multiple documents"){
+    demoObj.dropCollection("mydb", "test")
 
+    val documents = (1 to 100) map {i => Document("i" -> i)}
+    val collection = demoObj.getCollection("mydb", "test")
+    val insertedManyObservable = collection.insertMany(documents)
+    val insertAndCount = for {
+      _ <- insertedManyObservable
+      countResult <- collection.countDocuments
+    } yield {
+      countResult
+    }
+    assert(Await.result(insertAndCount.toFuture(), 2 seconds).head == 100)
   }
-  test("insert(attempt to insert) duplicate document - existing id"){
-
-  }
-  test("list of databases") {
-
+  test("list of collections") {
+    demoObj.dropDatabase("mydb")
+    demoObj.createCollection("mydb", "test_foo")
+    demoObj.createCollection("mydb", "test_bar")
+    val collections = demoObj.getCollectionList("mydb")
+    println(collections)
+    assert(collections.toSet == Seq("test_foo", "test_bar").toSet)
   }
   test("count of documents") {
 
