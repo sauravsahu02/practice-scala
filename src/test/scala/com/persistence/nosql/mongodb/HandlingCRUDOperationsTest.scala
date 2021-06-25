@@ -8,7 +8,8 @@ import com.mongodb.MongoWriteException
 import com.typesafe.scalalogging.LazyLogging
 import org.mongodb.scala._
 import org.mongodb.scala.bson.{BsonInt32, BsonNull, BsonString}
-import org.mongodb.scala.model.Filters.{equal, exists}
+import org.mongodb.scala.model.Filters.{equal, exists, gt}
+import org.mongodb.scala.model.Updates.{inc, set}
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
@@ -17,6 +18,7 @@ import scala.language.postfixOps
 import scala.util.{Failure, Try}
 
 class HandlingCRUDOperationsTest extends FunSuite with LazyLogging with BeforeAndAfter{
+  /* These tests aim to demonstrate effect of CRUD operations performed on MongoDB */
   val demoObj = new HandlingCRUDOperations
 
   before {
@@ -51,7 +53,7 @@ class HandlingCRUDOperationsTest extends FunSuite with LazyLogging with BeforeAn
     val collection = demoObj.getCollection("mydb", "test")
     val insertAndCount = for {
       _ <- collection.insertMany(documents)
-      countResult <- collection.countDocuments
+      countResult <- collection.countDocuments()
     } yield {
       countResult
     }
@@ -76,8 +78,8 @@ class HandlingCRUDOperationsTest extends FunSuite with LazyLogging with BeforeAn
     Await.ready(collection.insertMany(Seq(doc101, doc102, doc103, doc104)).toFuture(), 2 seconds)
 
     /* Equality Filter */
-    val doc101_ = Await.result(collection.find(equal("_id", 101)).first.toFuture, 2 seconds)
-    val doc102_ = Await.result(collection.find(equal("_id", 102)).first.toFuture, 2 seconds)
+    val doc101_ = Await.result(collection.find(equal("_id", 101)).first().toFuture(), 2 seconds)
+    val doc102_ = Await.result(collection.find(equal("_id", 102)).first().toFuture(), 2 seconds)
     assert(doc101_.getString("name") == "Foo")
     assert(doc102_.getInteger("count") == 10)
 
@@ -85,23 +87,43 @@ class HandlingCRUDOperationsTest extends FunSuite with LazyLogging with BeforeAn
     assert(doc101_.getOrElse("unknownField", "hello") == BsonString("hello"))
 
     /* Check for explicitly assigned NULL field */
-    val docWithNullName = Await.result(collection.find(equal("name", BsonNull())).first.toFuture, 2 seconds)
+    val docWithNullName = Await.result(collection.find(equal("name", BsonNull())).first().toFuture(), 2 seconds)
     assert(docWithNullName.getInteger("_id") == 103)
 
     /* Look out for document which doesn't have "name" as one of its fields */
-    val nameLessDoc  = Await.result(collection.find(exists("name", exists = false)).first.toFuture, 2 seconds)
+    val nameLessDoc  = Await.result(collection.find(exists("name", exists = false)).first().toFuture(), 2 seconds)
     assert(nameLessDoc.getInteger("_id") == 420)
 
-    val docIdNotExisting = Await.result(collection.find(equal("_id", -99)).first.toFuture, 2 seconds)
+    val docIdNotExisting = Await.result(collection.find(equal("_id", -99)).first().toFuture(), 2 seconds)
     assert(docIdNotExisting == null)
   }
 
-  test("update an existing document"){
+  test("update one existing document"){
+    val collection = demoObj.getCollection("mydb", "test")
+    val doc101: Document = Document("_id" -> 101, "name" -> "fOO", "count" -> 15)
 
+    Await.ready(collection.insertOne(doc101).toFuture(), 2 seconds)
+    /* Update the name. */
+    Await.ready(collection.updateOne(equal("name", "fOO"), set("name", "Foo")).toFuture(), 2 seconds)
+    val updatedNameDoc = Await.result(collection.find(equal("name", "Foo")).first().toFuture(), 2 seconds)
+
+    assert(updatedNameDoc.getInteger("_id") == 101)
   }
 
-  test("update a non-existing document"){
+  test("update many existing documents"){
+    val collection = demoObj.getCollection("mydb", "test")
+    val doc101: Document = Document("_id" -> 101, "name" -> "Foo", "count" -> 15)
+    val doc102: Document = Document("_id" -> 102, "name" -> "Bar", "count" -> 10)
+    val doc103: Document = Document("""{"_id": 103, "name": null}""")
+    val doc104: Document = Document("""{"_id": 420, "count": 18}""")
 
+    Await.ready(collection.insertMany(Seq(doc101, doc102, doc103, doc104)).toFuture(), 2 seconds)
+    /* add common last name to each name field */
+    Await.ready(collection.updateMany(gt("count", 0), inc("count", 1)).toFuture(), 3 seconds)
+    var updatedCountDoc = Await.result(collection.find(equal("_id", 101)).first().toFuture(), 2 seconds)
+    assert(updatedCountDoc.getInteger("count") == 16)
+    updatedCountDoc = Await.result(collection.find(equal("_id", 102)).first().toFuture(), 2 seconds)
+    assert(updatedCountDoc.getInteger("count") == 11)
   }
 
   test("delete an existing document"){
