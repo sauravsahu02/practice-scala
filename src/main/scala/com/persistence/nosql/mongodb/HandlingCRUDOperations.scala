@@ -36,4 +36,5 @@ class HandlingCRUDOperations {
   def insertDocument(collection: MongoCollection[Document], document: Document) = {
     Await.result(collection.insertOne(document).toFuture(), 2 seconds)
   }
+  def closeDBConnection() = mongoClient.close()
 }

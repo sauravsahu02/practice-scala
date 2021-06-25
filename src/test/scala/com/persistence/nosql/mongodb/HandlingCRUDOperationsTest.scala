@@ -9,20 +9,27 @@ import com.typesafe.scalalogging.LazyLogging
 import org.mongodb.scala._
 import org.mongodb.scala.bson.{BsonInt32, BsonNull, BsonString}
 import org.mongodb.scala.model.Filters.{equal, exists, gt}
+import org.mongodb.scala.model.Indexes
 import org.mongodb.scala.model.Updates.{inc, set}
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSuite}
 
 import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.language.postfixOps
 import scala.util.{Failure, Try}
 
-class HandlingCRUDOperationsTest extends FunSuite with LazyLogging with BeforeAndAfter{
+class HandlingCRUDOperationsTest extends FunSuite with LazyLogging with BeforeAndAfter with BeforeAndAfterAll{
   /* These tests aim to demonstrate effect of CRUD operations performed on MongoDB */
   val demoObj = new HandlingCRUDOperations
 
   before {
     demoObj.dropDatabase("mydb")
+  }
+
+  override def afterAll(): Unit = {
+    demoObj.dropDatabase("mydb")
+    demoObj.closeDBConnection
   }
 
   test("database and collection creation"){
@@ -127,38 +134,77 @@ class HandlingCRUDOperationsTest extends FunSuite with LazyLogging with BeforeAn
   }
 
   test("delete an existing document"){
+    val collection = demoObj.getCollection("mydb", "test")
+    val doc101: Document = Document("_id" -> 101, "name" -> "Foo", "count" -> 15)
+    Await.ready(collection.insertOne(doc101).toFuture(), 2 seconds)
+    assert(Await.result(collection.countDocuments().toFuture(), 2 seconds) == 1)
 
+    /* Delete a document directly by ref*/
+    Await.ready(collection.deleteOne(doc101).toFuture(), 2 seconds)
+    assert(Await.result(collection.countDocuments().toFuture(), 2 seconds) == 0)
   }
 
-  test("delete a non-existing document"){
+  test("delete many documents satisfying a filter"){
+    val collection = demoObj.getCollection("mydb", "test")
+    val doc101: Document = Document("_id" -> 101, "name" -> "Foo", "count" -> 15)
+    val doc102: Document = Document("_id" -> 102, "name" -> "Bar", "count" -> 55)
+    Await.ready(collection.insertMany(Seq(doc101, doc102)).toFuture(), 2 seconds)
+    assert(Await.result(collection.countDocuments().toFuture(), 2 seconds) == 2)
 
+    Await.ready(collection.deleteMany(gt("count", 10)).toFuture(), 2 seconds)
+    assert(Await.result(collection.countDocuments().toFuture(), 2 seconds) == 0)
   }
 
   test("delete an existing collection"){
+    demoObj.createCollection("mydb", "test")
+    val collectionsAfter = demoObj.getCollectionList("mydb")
+    assert(collectionsAfter.head.equals("test"))
 
+    demoObj.dropCollection("mydb", "test")
+    assert(collectionsAfter.head.equals("test"))
   }
 
   test("delete a non-existing collection"){
-
+    val (dbName, collectionName) = ("mydb", "unknown")
+    val collection = demoObj.getCollection(dbName, collectionName)
+    Await.result(collection.drop().toFuture(), 3 seconds)
   }
 
   test("delete an existing database"){
-
+    demoObj.dropDatabase("mydb") onComplete {
+      case Failure(value) => fail("Should not fail database deletion")
+      case _ => /* do nothing */
+    }
   }
 
   test("delete a non-existing database"){
-
-  }
-
-  test("query a collection") {
-
+    demoObj.dropDatabase("unknown") onComplete {
+      case Failure(value) => fail("Should not fail database deletion")
+      case _ => /* do nothing */
+    }
   }
 
   test("create a single index") {
-
+    demoObj.createCollection("mydb", "test")
+    val collection = demoObj.getCollection("mydb", "test")
+    val indexListBefore = Await.result(collection.listIndexes().toFuture(), 2 seconds)
+    /* Default index on field 'id' */
+    assert(indexListBefore.head.get("name").contains(BsonString("_id_")))
+    assert(indexListBefore.size == 1)
+    Await.ready(collection.createIndex(Document("name" -> 1)).toFuture(), 2 seconds) // createIndex
+    val indexListAfter = Await.result(collection.listIndexes().toFuture(), 2 seconds)
+    assert(indexListAfter.head.get("name").contains(BsonString("_id_")))
+    /* New index on field 'name' */
+    assert(indexListAfter(1).get("name").contains(BsonString("name_1")))
   }
 
   test("create a compound index") {
-
+    demoObj.createCollection("mydb", "test")
+    val collection = demoObj.getCollection("mydb", "test")
+    Await.ready(collection.createIndex(Indexes.compoundIndex(Indexes.ascending("name"),
+      Indexes.descending("count"))).toFuture(), 2 seconds)
+    val indexListAfter = Await.result(collection.listIndexes().toFuture(), 2 seconds)
+    /* Check presence of compound index */
+    assert(indexListAfter(1).get("name").contains(BsonString("name_1_count_-1")))
   }
 }
