@@ -27,7 +27,7 @@ class HandlingCRUDOperations {
     Await.result(mongoClient.getDatabase(dbName).listCollectionNames().toFuture(), 2 seconds)
   }
   def dropDatabase(dbName: String) = {
-    Await.ready(mongoClient.getDatabase(dbName).drop().toFuture(), 2 seconds)
+    Await.ready(mongoClient.getDatabase(dbName).drop().toFuture(), 3 seconds)
   }
   def dropCollection(dbName : String, collectionName: String) = {
     val collection = getCollection(dbName, collectionName)
