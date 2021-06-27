@@ -16,7 +16,6 @@ object RunTasksAsyncWay extends LazyLogging {
   val counter = new AtomicInteger()
   def apply(executionContextExecutor: ExecutionContextExecutor) = {
     val futures = new ListBuffer[Future[Unit]]
-    val t1 = System.nanoTime
     (1 to nFuture) foreach { n =>
       futures.append(Future {
         logger.info("starting Future: " + n)
