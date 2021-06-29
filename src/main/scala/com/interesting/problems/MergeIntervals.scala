@@ -3,9 +3,6 @@ package com.interesting.problems
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Sorting
 import scala.collection.immutable.ArraySeq.unsafeWrapArray
-/**
- * Created by Saurav Sahu - 23-May-2021
- */
 
 object MergeIntervals{
   def apply(input : Array[(Int, Int)]) : Array[(Int, Int)] = {

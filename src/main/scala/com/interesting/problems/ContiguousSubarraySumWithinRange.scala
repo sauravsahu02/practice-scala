@@ -5,9 +5,7 @@
 package com.interesting.problems
 
 import scala.collection.mutable
-/**
- * Created by Saurav Sahu - 19-May-2021
- */
+
 class ContiguousSubarraySumWithinRange(val inputArr: Array[Int]){
   def getCount(lowerBound: Int, upperBound: Int): Int = {
     var cumSum = 0

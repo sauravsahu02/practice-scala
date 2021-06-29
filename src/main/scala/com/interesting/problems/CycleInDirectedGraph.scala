@@ -5,9 +5,7 @@
 package com.interesting.problems
 
 import scala.collection._
-/**
- * Created by Saurav Sahu - 20-May-2021
- */
+
 class CycleInDirectedGraph(val inputArr: Array[(Int, Int)]) {
   // Algorithm : Start from each candidate vertex, do a dfs on all 'unmarked' neighbouring vertices, and then unmark the vertex
   // Common Mistake: Ensure that the return value 'true' is transmitted down the stack

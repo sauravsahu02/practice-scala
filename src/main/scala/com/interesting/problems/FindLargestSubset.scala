@@ -5,9 +5,7 @@
 package com.interesting.problems
 
 import scala.collection.mutable
-/**
- * Created by Saurav Sahu - 21-May-2021
- */
+
 class FindLargestSubset(val inputArr: Array[Int]) {
   // Given an int array which might contain duplicates, find the largest subset of
   // it which form a sequence.
