@@ -49,11 +49,12 @@ object JsonDemo extends App{
     ))
   ))
 
+  def inQuotes(str: String) = "\"" + str + "\""
   def show(json: JSON): String = {
     json match {
-      case JObj(jmap) => "{" + jmap.map{case (k, json) => k + ": " + show(json)}.mkString(", ") + "}"
-      case JStr(string) => "\"" + string + "\""
-      case JSeq(list) => "[" + list.map(elem => show(elem)).mkString(",") + "]"
+      case JObj(jmap) => jmap.map{case (k, json) => s"${inQuotes(k)}: ${show(json)}"}.mkString("{", ",\n", "}")  //mkString("{", ":", "}")
+      case JStr(string) => inQuotes(string)
+      case JSeq(list) => list.map(elem => show(elem)).mkString("[", ",", "]")
       case JNum(num) => num.toString
       case JBool(b) =>  b.toString
     }
